@@ -3,7 +3,7 @@
 import sys
 from math import exp
 from random import random, uniform, gauss
-import numpy as np
+# import numpy as np
 
 
 L = 2.0
@@ -22,8 +22,8 @@ def main():
     S2 = 0.0
     for i in range(N):
         while True:
-            # x = gauss(0.0, 1.0)
-            x = np.random.randn()
+            x = gauss(0.0, 1.0)
+            # x = np.random.randn()
             if abs(x) <= L: break
         S2 += f(x)/g(x)
     S2 /= N
@@ -32,8 +32,8 @@ def main():
     S3 = 0.0
     for i in range(N):
         while True:
-            # x = gauss(0.0, 0.6)
-            x = np.random.randn()*0.6
+            x = gauss(0.0, 0.6)
+            # x = np.random.randn()*0.6
             if abs(x) <= L: break
         S3 += f(x)/h(x)
     S3 /= N
@@ -56,7 +56,7 @@ def g(x):
 
 
 def h(x):
-    # sigma = 0.6; important: sqrt(2*pi*0.6) ~= 1.9416259125556992
+    # sigma = 0.6; sqrt(2*pi*0.6) ~= 1.9416259125556992
     # true normalization: \int _{-2} ^{+2} exp(-x*x/1.2) dx ~= 1.9225527882257518
     return exp(-x*x/1.2)/1.9225527882257518
 
