@@ -3,15 +3,16 @@
 """
 variational Monte Carlo
 for hydrogen atom
+NOTE: the WRONG way ... no cusp treatment
 """
 
 import sys
 import numpy as np
 from math import exp, log1p, sqrt
-from random import random, randrange
+from random import random
 
 
-alpha = 1.1
+alpha = 0.8
 stepSize = 1.0      # adjust this for efficient flow through configuration space
 
 
@@ -28,10 +29,12 @@ def main():
     # equilibration block
     for t in range(N_equil):
         # trial displacement
-        R_trial = cnf + np.random.randn(3)*stepSize
+        # R_trial = cnf + np.random.randn(3)*stepSize
+        R_trial = cnf + np.random.uniform(-0.5,0.5)*stepSize
         dU = changeMinusLnPsi2(cnf, R_trial)       # calculate change -ln Psi^2
         # print(dU, beta*dU, exp(-beta*dU))
-        if random() < exp(-dU):
+        # random() < exp(-dU)
+        if -log1p(-random()) > dU:
             cnf[:] = R_trial[:]
             U += dU
 
@@ -39,13 +42,14 @@ def main():
     E_data = list()
     for t in range(N_steps):
         # trial displacement
-        R_trial = cnf + np.random.randn(3)*stepSize
+        # R_trial = cnf + np.random.randn(3)*stepSize
+        R_trial = cnf + np.random.uniform(-0.5,0.5)*stepSize
         dU = changeMinusLnPsi2(cnf, R_trial)       # calculate change -ln Psi^2
-        if random() < exp(-dU):
+        if -log1p(-random()) > dU:
             cnf[:] = R_trial[:]
             U += dU
-            E_data.append(localEnergy(cnf))    # append energy to list
             N_accpt += 1
+        E_data.append(localEnergy(cnf))    # append energy to list
 
     print(N_accpt/N_steps, "acceptance")
     E_data = np.array(E_data)

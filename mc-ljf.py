@@ -56,8 +56,8 @@ def main():
         if -T*log1p(-random()) > dU:
             cnf[i,:] = R_trial[:]   # update the current cnf
             U += dU                 # update the potential
-            U_data.append(U)        # append potential to list
             N_accpt += 1            # count as accepted
+        U_data.append(U)        # append potential to list
 
     print(N_accpt/N_steps, "acceptance")
     U_data = np.array(U_data)
