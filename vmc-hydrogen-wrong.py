@@ -12,8 +12,9 @@ from math import exp, log1p, sqrt
 from random import random
 
 
-alpha = 0.8
-stepSize = 1.0      # adjust this for efficient flow through configuration space
+# \Psi_T ~ e^{-\alpha*r}
+alpha = 0.80        # minimum at 1
+stepSize = 2.0      # adjust this for efficient flow through configuration space
 
 
 def main():
@@ -23,6 +24,7 @@ def main():
 
     # np.random.seed(12345)           # for debugging, fix the internal rng state
     cnf = np.random.randn(3)     # initialize configuration
+    print("Initial coordinates:\n", cnf)
 
     U = totalMinusLnPsi2(cnf)
 
@@ -30,7 +32,7 @@ def main():
     for t in range(N_equil):
         # trial displacement
         # R_trial = cnf + np.random.randn(3)*stepSize
-        R_trial = cnf + np.random.uniform(-0.5,0.5)*stepSize
+        R_trial = cnf + np.random.uniform(-0.5,0.5,size=3)*stepSize
         dU = changeMinusLnPsi2(cnf, R_trial)       # calculate change -ln Psi^2
         # print(dU, beta*dU, exp(-beta*dU))
         # random() < exp(-dU)
@@ -43,13 +45,13 @@ def main():
     for t in range(N_steps):
         # trial displacement
         # R_trial = cnf + np.random.randn(3)*stepSize
-        R_trial = cnf + np.random.uniform(-0.5,0.5)*stepSize
+        R_trial = cnf + np.random.uniform(-0.5,0.5,size=3)*stepSize
         dU = changeMinusLnPsi2(cnf, R_trial)       # calculate change -ln Psi^2
         if -log1p(-random()) > dU:
             cnf[:] = R_trial[:]
             U += dU
             N_accpt += 1
-        E_data.append(localEnergy(cnf))    # append energy to list
+        E_data.append(localEnergy(cnf))     # append energy to list, regardless of acceptance
 
     print(N_accpt/N_steps, "acceptance")
     E_data = np.array(E_data)

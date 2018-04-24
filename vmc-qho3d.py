@@ -8,57 +8,57 @@ for 3-dimensional harmonic oscillator
 import sys
 import numpy as np
 from math import exp, log1p, sqrt
-# from random import random
+from random import random
 
 
-alpha = 0.60
-stepSize = 1.0      # adjust this for efficient flow through configuration space
+# \Psi_T ~ e^{-\alpha*(x^2+y^2+z^2)}
+alpha = 0.40        # minimum at 0.5
+stepSize = 2.0      # adjust this for efficient flow through configuration space
 
 
 def main():
     N_equil = int(1e3)
     N_steps = int(1e5)
     N_accpt = 0
+    print("Variational parameter alpha =", alpha)
 
     # np.random.seed(12345)           # for debugging, fix the internal rng state
     cnf = np.random.randn(3)*stepSize     # initialize configuration
+    print("Initial coordinates:", cnf)
 
-    print("Initial coordinates:\n", cnf)
     U = totalMinusLnPsi2(cnf)
 
     # equilibration block
     for t in range(N_equil):
         # trial displacement
         # R_trial = cnf + np.random.randn(3)*stepSize
-        R_trial = cnf + np.random.uniform(-0.5,0.5)*stepSize
+        R_trial = cnf + np.random.uniform(-0.5,0.5,size=3)*stepSize
         dU = changeMinusLnPsi2(cnf, R_trial)       # calculate change -ln Psi^2
         # print(dU, beta*dU, exp(-beta*dU))
         # if random() < exp(-dU):
-        if -log1p(-np.random.random()) > dU:
+        if -log1p(-random()) > dU:
             cnf[:] = R_trial[:]
             U += dU
-        # print("e", U, dU)
 
     # main block (data accumulation)
     E_data = list()
     for t in range(N_steps):
         # trial displacement
         # R_trial = cnf + np.random.randn(3)*stepSize
-        R_trial = cnf + np.random.uniform(-0.5,0.5)*stepSize
+        R_trial = cnf + np.random.uniform(-0.5,0.5,size=3)*stepSize
         dU = changeMinusLnPsi2(cnf, R_trial)       # calculate change -ln Psi^2
-        if -log1p(-np.random.random()) > dU:
+        if -log1p(-random()) > dU:
             cnf[:] = R_trial[:]
             U += dU
             N_accpt += 1
-        E_data.append(localEnergy(cnf))    # append energy to list
-        # print("m", U, dU)
+        E_data.append(localEnergy(cnf))     # append energy to list, regardless of acceptance
 
     print(N_accpt/N_steps, "acceptance")
     E_data = np.array(E_data)
     mu, serr, s, kappa = doStats(E_data)    # calculate statistics of time series
     print("E = %f +- %f" % (mu, serr))
 
-    print("Final coordinates:\n", cnf)
+    print("Final coordinates:", cnf)
 
     return 0
 
